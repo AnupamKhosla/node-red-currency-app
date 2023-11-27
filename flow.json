@@ -1,0 +1,402 @@
+[
+    {
+        "id": "7d86aca3f0378f2e",
+        "type": "tab",
+        "label": "Flow 3",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "c8413eba86d8d5c4",
+        "type": "debug",
+        "z": "7d86aca3f0378f2e",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1040,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "204756ef1d704a3d",
+        "type": "ui_text",
+        "z": "7d86aca3f0378f2e",
+        "group": "960da8a2fef68c6a",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Output",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1050,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "c3fbbb331d0fd8b1",
+        "type": "ui_text_input",
+        "z": "7d86aca3f0378f2e",
+        "name": "",
+        "label": "Amount",
+        "tooltip": "",
+        "group": "960da8a2fef68c6a",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "mode": "number",
+        "delay": 300,
+        "topic": "amount",
+        "sendOnBlur": true,
+        "className": "",
+        "topicType": "str",
+        "x": 120,
+        "y": 140,
+        "wires": [
+            [
+                "42426c71ddc1219d"
+            ]
+        ]
+    },
+    {
+        "id": "14cb109c272dde56",
+        "type": "function",
+        "z": "7d86aca3f0378f2e",
+        "name": "function 2",
+        "func": "//set default state of the app\n//var state = {from: \"AUD\", to: \"INR\"};\n\n//modiffy state on input\n/*\nif (flow.get(\"from\") == undefined) {\n  flow.set(\"from\") = \"AUD\";\n}\nif(msg.topic == \"from\") //From dropdown selected\n  flow.set(\"from\") = msg.payload;\n  \n\n\n//modiffy state on input\nif (flow.get(\"to\") == undefined) {\n  flow.set(\"to\") = \"INR\";\n}\nif(msg.topic == \"to\") //From dropdown selected\n  flow.set(\"to\") = msg.payload;  \n\n*/\nif(flow.get(\"from\") !== flow.get(\"to\"))\n  msg.url = \"https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/\" + flow.get(\"from\").toLowerCase() + \"/\" + flow.get(\"to\").toLowerCase() + \".json\";\nreturn {payload: msg, url: msg.url};",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 300,
+        "wires": [
+            [
+                "7c30d6c2231f362e"
+            ]
+        ]
+    },
+    {
+        "id": "7c30d6c2231f362e",
+        "type": "http request",
+        "z": "7d86aca3f0378f2e",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 550,
+        "y": 300,
+        "wires": [
+            [
+                "14c0513932278488"
+            ]
+        ]
+    },
+    {
+        "id": "46dfc10514dde4c5",
+        "type": "change",
+        "z": "7d86aca3f0378f2e",
+        "name": "From curr state",
+        "rules": [
+            {
+                "t": "set",
+                "p": "from",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 220,
+        "y": 260,
+        "wires": [
+            [
+                "14cb109c272dde56"
+            ]
+        ]
+    },
+    {
+        "id": "3c1bd1a7bfa40e19",
+        "type": "change",
+        "z": "7d86aca3f0378f2e",
+        "name": "To curr state",
+        "rules": [
+            {
+                "t": "set",
+                "p": "to",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 210,
+        "y": 360,
+        "wires": [
+            [
+                "14cb109c272dde56"
+            ]
+        ]
+    },
+    {
+        "id": "30f240ee8e22c1f1",
+        "type": "function",
+        "z": "7d86aca3f0378f2e",
+        "name": "function 3",
+        "func": "const output = JSON.parse(flow.get(\"httpResponse\"));\n//const rate = Object.keys(output);\nconst rateKey = Object.keys(output)[1];\nconst rate = output[rateKey];\n\nconst outputAmount = flow.get(\"amount\") * rate;\n\n\nreturn { payload: outputAmount };",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 920,
+        "y": 260,
+        "wires": [
+            [
+                "c8413eba86d8d5c4",
+                "204756ef1d704a3d"
+            ]
+        ]
+    },
+    {
+        "id": "42426c71ddc1219d",
+        "type": "change",
+        "z": "7d86aca3f0378f2e",
+        "name": "Amount state",
+        "rules": [
+            {
+                "t": "set",
+                "p": "amount",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 250,
+        "y": 140,
+        "wires": [
+            [
+                "30f240ee8e22c1f1"
+            ]
+        ]
+    },
+    {
+        "id": "14c0513932278488",
+        "type": "change",
+        "z": "7d86aca3f0378f2e",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "httpResponse",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 720,
+        "y": 300,
+        "wires": [
+            [
+                "30f240ee8e22c1f1"
+            ]
+        ]
+    },
+    {
+        "id": "f272101424a09ca8",
+        "type": "ui_dropdown",
+        "z": "7d86aca3f0378f2e",
+        "name": "",
+        "label": "To",
+        "tooltip": "",
+        "place": "",
+        "group": "960da8a2fef68c6a",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "multiple": false,
+        "options": [
+            {
+                "label": "USD",
+                "value": "USD",
+                "type": "str"
+            },
+            {
+                "label": "EUR",
+                "value": "EUR",
+                "type": "str"
+            },
+            {
+                "label": "GBP",
+                "value": "GBP",
+                "type": "str"
+            },
+            {
+                "label": "NZD",
+                "value": "NZD",
+                "type": "str"
+            },
+            {
+                "label": "CAD",
+                "value": "CAD",
+                "type": "str"
+            },
+            {
+                "label": "ZAR",
+                "value": "ZAR",
+                "type": "str"
+            },
+            {
+                "label": "JPY",
+                "value": "JPY",
+                "type": "str"
+            },
+            {
+                "label": "CHF",
+                "value": "CHF",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "to",
+        "topicType": "str",
+        "className": "",
+        "x": 90,
+        "y": 360,
+        "wires": [
+            [
+                "3c1bd1a7bfa40e19"
+            ]
+        ]
+    },
+    {
+        "id": "27d0f7fb6dbf2486",
+        "type": "ui_dropdown",
+        "z": "7d86aca3f0378f2e",
+        "name": "",
+        "label": "From",
+        "tooltip": "",
+        "place": "",
+        "group": "960da8a2fef68c6a",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "multiple": false,
+        "options": [
+            {
+                "label": "USD",
+                "value": "USD",
+                "type": "str"
+            },
+            {
+                "label": "EUR",
+                "value": "EUR",
+                "type": "str"
+            },
+            {
+                "label": "GBP",
+                "value": "GBP",
+                "type": "str"
+            },
+            {
+                "label": "NZD",
+                "value": "NZD",
+                "type": "str"
+            },
+            {
+                "label": "CAD",
+                "value": "CAD",
+                "type": "str"
+            },
+            {
+                "label": "ZAR",
+                "value": "ZAR",
+                "type": "str"
+            },
+            {
+                "label": "JPY",
+                "value": "JPY",
+                "type": "str"
+            },
+            {
+                "label": "CHF",
+                "value": "CHF",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "from",
+        "topicType": "str",
+        "className": "",
+        "x": 90,
+        "y": 260,
+        "wires": [
+            [
+                "46dfc10514dde4c5"
+            ]
+        ]
+    },
+    {
+        "id": "960da8a2fef68c6a",
+        "type": "ui_group",
+        "name": "Type in amount to convert",
+        "tab": "9fab6193fbf21094",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "9fab6193fbf21094",
+        "type": "ui_tab",
+        "name": "Real time currency conversion",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    }
+]
